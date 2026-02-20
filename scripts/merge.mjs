@@ -11,30 +11,78 @@ if (urls.length === 0) {
 
 const TIMEOUT = 8000;
 const SLOW_LIMIT = 2000;
-const TEST_FILE = "https://speed.hetzner.de/10MB.bin"; // سبک‌تر از 100MB
+const TEST_FILE = "https://speed.hetzner.de/10MB.bin";
+
 const results = [];
 
 async function testServer(url) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), TIMEOUT);
-
   let latency = 0;
   let speedMbps = 0;
   let status = "down";
 
   try {
-    // latency test
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), TIMEOUT);
+
     const start = performance.now();
     const res = await fetch(url, { signal: controller.signal });
     latency = Math.round(performance.now() - start);
 
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    clearTimeout(timeout);
 
-    // download speed test
-    const dlStart = performance.now();
-    const dlRes = await fetch(TEST_FILE);
-    const buffer = await dlRes.arrayBuffer();
-    const dlTime = (performance.now() - dlStart) / 1000;
+    if (!res.ok) {
+      status = "down";
+    } else {
+      const dlStart = performance.now();
+      const dlRes = await fetch(TEST_FILE);
+      const buffer = await dlRes.arrayBuffer();
+      const dlTime = (performance.now() - dlStart) / 1000;
+
+      const sizeMB = buffer.byteLength / (1024 * 1024);
+      speedMbps = Math.round((sizeMB / dlTime) * 8);
+
+      status = latency < SLOW_LIMIT ? "healthy" : "slow";
+    }
+
+  } catch (err) {
+    status = "down";
+  }
+
+  results.push({
+    url,
+    status,
+    latency,
+    speedMbps
+  });
+}
+
+async function run() {
+  for (const url of urls) {
+    console.log("Testing:", url);
+    await testServer(url);
+  }
+
+  if (!fs.existsSync("docs")) {
+    fs.mkdirSync("docs");
+  }
+
+  fs.writeFileSync(
+    "docs/report.json",
+    JSON.stringify(
+      {
+        updated: new Date().toISOString(),
+        total: results.length,
+        results
+      },
+      null,
+      2
+    )
+  );
+
+  console.log("Report generated.");
+}
+
+run();    const dlTime = (performance.now() - dlStart) / 1000;
     const sizeMB = buffer.byteLength / (1024 * 1024);
     speedMbps = Math.round((sizeMB / dlTime) * 8);
 
