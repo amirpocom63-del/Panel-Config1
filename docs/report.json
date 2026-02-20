@@ -1,24 +1,42 @@
 {
-  "updated": "2026-02-20T18:38:53.415Z",
-  "total": 3,
+  "updated": "2026-02-20T18:53:55.264Z",
+  "total": 6,
   "results": [
     {
-      "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/mixed_iran.txt،https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vless_iran.txt،https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/trojan_iran.txt",
-      "status": "down",
-      "latency": 375,
-      "speedMbps": 0
+      "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/ss_iran.txt",
+      "status": "healthy",
+      "latency": 269,
+      "speedMbps": 191
     },
     {
       "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vmess_iran.txt",
       "status": "healthy",
-      "latency": 141,
-      "speedMbps": 1485
+      "latency": 126,
+      "speedMbps": 1662
     },
     {
-      "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/ss_iran.txt",
+      "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/trojan_iran.txt",
       "status": "healthy",
-      "latency": 130,
-      "speedMbps": 396
+      "latency": 125,
+      "speedMbps": 528
+    },
+    {
+      "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vless_iran.txt",
+      "status": "healthy",
+      "latency": 153,
+      "speedMbps": 4142
+    },
+    {
+      "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/mixed_iran.txt",
+      "status": "healthy",
+      "latency": 107,
+      "speedMbps": 546
+    },
+    {
+      "url": "https://raw.githubusercontent.com/liketolivefree/kobabi/main/sub.txt",
+      "status": "healthy",
+      "latency": 123,
+      "speedMbps": 604
     }
   ]
 }
