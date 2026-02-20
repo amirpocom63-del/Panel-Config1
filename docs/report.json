@@ -1,0 +1,23 @@
+{
+  "ok": [
+    {
+      "url": "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/vmess.html",
+      "lines": 49
+    },
+    {
+      "url": "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/trojan.html",
+      "lines": 16
+    }
+  ],
+  "bad": [
+    {
+      "url": "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/hy2.html",
+      "error": "unhealthy:too_few_lines"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/tuic.html",
+      "error": "unhealthy:too_short"
+    }
+  ],
+  "total_lines": 65
+}
