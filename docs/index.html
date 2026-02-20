@@ -1,40 +1,253 @@
-
-<!doctype html>
-<html lang="fa" dir="rtl">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Company Feed</title>
-  <meta name="color-scheme" content="dark light" />
-  <style>
-    :root{
-      --bg:#0b1020; --card:#0f1730; --muted:#9aa7c7; --text:#e9eeff;
-      --line:rgba(255,255,255,.08); --shadow:0 14px 45px rgba(0,0,0,.35);
-      --ok:#20c997; --bad:#ff6b6b; --warn:#ffd43b; --accent:#7c5cff;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      --radius:18px;
+<meta charset="UTF-8">
+<title>Panel MrVpn</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,Arial;
+  background: radial-gradient(circle at 20% 20%, #1e293b, #0f172a 60%);
+  color:white;
+}
+.header{
+  padding:30px 40px;
+  font-size:28px;
+  font-weight:600;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+.container{
+  padding:40px;
+}
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+  gap:25px;
+  margin-bottom:40px;
+}
+.card{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:20px;
+  padding:30px;
+  backdrop-filter:blur(15px);
+  transition:0.3s;
+}
+.card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 20px 50px rgba(0,0,0,0.4);
+}
+.card h2{
+  font-size:40px;
+  margin:0;
+}
+.section{
+  margin-top:40px;
+}
+canvas{
+  background:rgba(255,255,255,0.05);
+  border-radius:20px;
+  padding:20px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+  background:rgba(255,255,255,0.05);
+  border-radius:20px;
+  overflow:hidden;
+}
+th,td{
+  padding:15px;
+  text-align:left;
+}
+th{
+  background:rgba(255,255,255,0.08);
+  cursor:pointer;
+}
+tr:nth-child(even){
+  background:rgba(255,255,255,0.03);
+}
+.badge{
+  padding:5px 10px;
+  border-radius:10px;
+  font-size:12px;
+}
+.healthy{background:#16a34a}
+.slow{background:#facc15;color:black}
+.down{background:#dc2626}
+
+/* Login Screen */
+#loginScreen{
+position:fixed;
+inset:0;
+background:linear-gradient(135deg,#0f172a,#1e293b);
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+}
+.loginBox{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(20px);
+padding:40px;
+border-radius:20px;
+width:300px;
+text-align:center;
+}
+.loginBox input{
+width:100%;
+padding:12px;
+margin:20px 0;
+border-radius:10px;
+border:none;
+}
+.loginBox button{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:none;
+background:#3b82f6;
+color:white;
+cursor:pointer;
+}
+#errorMsg{
+color:#dc2626;
+display:none;
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginScreen">
+  <div class="loginBox">
+    <h2>🔐 Panel MrVpn</h2>
+    <input type="password" id="passwordInput" placeholder="Enter password">
+    <button onclick="login()">Login</button>
+    <p id="errorMsg">Wrong password</p>
+  </div>
+</div>
+
+<div class="header">🚀 Panel MrVpn</div>
+
+<div class="container">
+
+<div class="grid">
+  <div class="card">
+    <h2 id="healthy">0</h2>
+    <span>🟢 Healthy</span>
+  </div>
+  <div class="card">
+    <h2 id="slow">0</h2>
+    <span>🟡 Slow</span>
+  </div>
+  <div class="card">
+    <h2 id="down">0</h2>
+    <span>🔴 Down</span>
+  </div>
+</div>
+
+<div class="section">
+  <canvas id="speedChart"></canvas>
+</div>
+
+<div class="section">
+  <canvas id="statusChart"></canvas>
+</div>
+
+<div class="section">
+  <h2>Server List</h2>
+  <table id="serverTable">
+    <thead>
+      <tr>
+        <th>Server</th>
+        <th>Latency</th>
+        <th>Speed</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+</div>
+
+<script>
+const CORRECT_PASSWORD = "Amir1388*";
+
+function login(){
+  const input = document.getElementById("passwordInput").value;
+  if(input === CORRECT_PASSWORD){
+    sessionStorage.setItem("auth","true");
+    document.getElementById("loginScreen").style.display="none";
+  } else {
+    document.getElementById("errorMsg").style.display="block";
+  }
+}
+
+if(sessionStorage.getItem("auth")==="true"){
+  document.getElementById("loginScreen").style.display="none";
+}
+
+fetch("report.json")
+.then(r=>r.json())
+.then(data=>{
+  let healthy=0, slow=0, down=0;
+
+  data.results.forEach(s=>{
+    if(s.status==="healthy") healthy++;
+    if(s.status==="slow") slow++;
+    if(s.status==="down") down++;
+  });
+
+  document.getElementById("healthy").innerText=healthy;
+  document.getElementById("slow").innerText=slow;
+  document.getElementById("down").innerText=down;
+
+  new Chart(document.getElementById("speedChart"),{
+    type:"bar",
+    data:{
+      labels:data.results.map(r=>r.url),
+      datasets:[{
+        label:"Speed (Mbps)",
+        data:data.results.map(r=>r.speedMbps),
+        backgroundColor:"#3b82f6"
+      }]
     }
-    @media (prefers-color-scheme: light){
-      :root{
-        --bg:#f6f8ff; --card:#ffffff; --muted:#4e5b7a; --text:#0b1020;
-        --line:rgba(0,0,0,.08); --shadow:0 12px 40px rgba(10,20,60,.12);
-      }
+  });
+
+  new Chart(document.getElementById("statusChart"),{
+    type:"doughnut",
+    data:{
+      labels:["Healthy","Slow","Down"],
+      datasets:[{
+        data:[healthy,slow,down],
+        backgroundColor:["#16a34a","#facc15","#dc2626"]
+      }]
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:var(--sans); background:
-        radial-gradient(900px 420px at 80% 10%, rgba(124,92,255,.22), transparent 60%),
-        radial-gradient(700px 360px at 10% 0%, rgba(32,201,151,.18), transparent 60%),
-        var(--bg);
-      color:var(--text);
-    }
-    .wrap{max-width:1040px; margin:0 auto; padding:26px 16px 44px}
-    header{
-      display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
-      margin-bottom:16px;
-    }
-    .title{
+  });
+
+  let tbody=document.querySelector("#serverTable tbody");
+  data.results.forEach(r=>{
+    let row=document.createElement("tr");
+    row.innerHTML=`
+      <td>${r.url}</td>
+      <td>${r.latency} ms</td>
+      <td>${r.speedMbps} Mbps</td>
+      <td><span class="badge ${r.status}">${r.status}</span></td>
+    `;
+    tbody.appendChild(row);
+  });
+});
+</script>
+
+</body>
+</html>    .title{
       display:flex; flex-direction:column; gap:6px;
     }
     h1{margin:0; font-size:22px; letter-spacing:.2px}
