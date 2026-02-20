@@ -1,1 +1,324 @@
 
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Company Feed</title>
+  <meta name="color-scheme" content="dark light" />
+  <style>
+    :root{
+      --bg:#0b1020; --card:#0f1730; --muted:#9aa7c7; --text:#e9eeff;
+      --line:rgba(255,255,255,.08); --shadow:0 14px 45px rgba(0,0,0,.35);
+      --ok:#20c997; --bad:#ff6b6b; --warn:#ffd43b; --accent:#7c5cff;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      --radius:18px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f8ff; --card:#ffffff; --muted:#4e5b7a; --text:#0b1020;
+        --line:rgba(0,0,0,.08); --shadow:0 12px 40px rgba(10,20,60,.12);
+      }
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:var(--sans); background:
+        radial-gradient(900px 420px at 80% 10%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(700px 360px at 10% 0%, rgba(32,201,151,.18), transparent 60%),
+        var(--bg);
+      color:var(--text);
+    }
+    .wrap{max-width:1040px; margin:0 auto; padding:26px 16px 44px}
+    header{
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    .title{
+      display:flex; flex-direction:column; gap:6px;
+    }
+    h1{margin:0; font-size:22px; letter-spacing:.2px}
+    .sub{color:var(--muted); font-size:13px; line-height:1.6}
+    .pillbar{display:flex; gap:8px; flex-wrap:wrap}
+    .pill{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      padding:8px 10px; border-radius:999px; font-size:12px; color:var(--muted);
+      display:flex; gap:8px; align-items:center;
+    }
+    .dot{width:8px; height:8px; border-radius:999px; background:var(--warn)}
+    .dot.ok{background:var(--ok)}
+    .dot.bad{background:var(--bad)}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+      margin-top:14px;
+    }
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+      backdrop-filter: blur(8px);
+    }
+    .card h2{
+      margin:0 0 10px 0; font-size:14px; color:var(--muted); font-weight:600;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .btnrow{display:flex; gap:10px; flex-wrap:wrap}
+    a.btn, button.btn{
+      appearance:none; border:1px solid var(--line); background:rgba(255,255,255,.03);
+      color:var(--text); text-decoration:none; padding:10px 12px; border-radius:14px;
+      font-size:13px; display:inline-flex; gap:8px; align-items:center;
+      cursor:pointer; transition: transform .06s ease, background .12s ease;
+    }
+    a.btn:hover, button.btn:hover{background:rgba(255,255,255,.06)}
+    a.btn:active, button.btn:active{transform:translateY(1px)}
+    .btn.primary{border-color:rgba(124,92,255,.45); background:rgba(124,92,255,.14)}
+    .btn.primary:hover{background:rgba(124,92,255,.20)}
+    .btn.ok{border-color:rgba(32,201,151,.45); background:rgba(32,201,151,.10)}
+    .btn.ok:hover{background:rgba(32,201,151,.14)}
+    .btn.bad{border-color:rgba(255,107,107,.45); background:rgba(255,107,107,.10)}
+    .btn.bad:hover{background:rgba(255,107,107,.14)}
+    .meta{
+      display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:12px;
+    }
+    @media (max-width: 520px){ .meta{grid-template-columns:1fr} }
+    .kv{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      border-radius:14px;
+      padding:10px 12px;
+    }
+    .kv .k{color:var(--muted); font-size:12px}
+    .kv .v{font-family:var(--mono); font-size:13px; margin-top:6px; word-break:break-all}
+    pre{
+      margin:0; padding:12px; border-radius:14px; border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+      overflow:auto; max-height:360px;
+      font-family:var(--mono); font-size:12.5px; line-height:1.55;
+      white-space:pre-wrap; word-break:break-word;
+    }
+    footer{margin-top:16px; color:var(--muted); font-size:12px}
+    .toast{
+      position:fixed; inset:auto 14px 14px auto;
+      background:rgba(0,0,0,.72); color:#fff; padding:10px 12px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      font-size:12px; opacity:0; transform: translateY(6px);
+      transition: opacity .18s ease, transform .18s ease;
+      pointer-events:none;
+    }
+    .toast.show{opacity:1; transform: translateY(0)}
+    .small{font-size:12px; color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Company Feed Dashboard</h1>
+        <div class="sub">
+          خروجی‌ها از طریق GitHub Actions ساخته می‌شن و این صفحه فقط لینک‌ها و وضعیت رو نمایش می‌ده.
+          <span class="small"> (merged.txt / report.json / last_updated.txt)</span>
+        </div>
+      </div>
+
+      <div class="pillbar">
+        <div class="pill" id="pillStatus"><span class="dot" id="dot"></span><span id="statusText">در حال بررسی…</span></div>
+        <div class="pill">آخرین آپدیت: <span id="lastUpdated">—</span></div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>
+          لینک‌ها
+          <span class="small" id="baseUrl"></span>
+        </h2>
+
+        <div class="btnrow">
+          <a class="btn primary" href="./merged.txt" id="linkMerged">📄 merged.txt</a>
+          <a class="btn" href="./report.json" id="linkReport">🧾 report.json</a>
+          <a class="btn" href="./last_updated.txt" id="linkUpdated">🕒 last_updated.txt</a>
+          <button class="btn ok" id="copyMerged">📋 کپی لینک merged.txt</button>
+          <button class="btn" id="copyAll">📋 کپی همه لینک‌ها</button>
+        </div>
+
+        <div class="meta">
+          <div class="kv">
+            <div class="k">OK sources</div>
+            <div class="v" id="okCount">—</div>
+          </div>
+          <div class="kv">
+            <div class="k">Failed sources</div>
+            <div class="v" id="badCount">—</div>
+          </div>
+          <div class="kv">
+            <div class="k">Total lines (reported)</div>
+            <div class="v" id="totalLines">—</div>
+          </div>
+          <div class="kv">
+            <div class="k">Health</div>
+            <div class="v" id="healthText">—</div>
+          </div>
+        </div>
+
+        <footer>
+          اگر می‌خوای دسترسی به لینک‌ها محدود بشه، بهتره Pages رو Public نذاری یا خروجی رو در یک محل داخلی سرو کنید.
+        </footer>
+      </section>
+
+      <section class="card">
+        <h2>
+          خلاصه گزارش
+          <button class="btn" id="refresh">🔄 رفرش</button>
+        </h2>
+        <pre id="reportPreview">در حال بارگذاری report.json …</pre>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:14px">
+      <h2>پیش‌نمایش merged.txt <span class="small">(فقط بخش اول)</span></h2>
+      <pre id="mergedPreview">در حال بارگذاری merged.txt …</pre>
+    </section>
+  </div>
+
+  <div class="toast" id="toast">کپی شد</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  const dot = $("dot");
+  const statusText = $("statusText");
+  const lastUpdated = $("lastUpdated");
+  const baseUrl = $("baseUrl");
+
+  const okCount = $("okCount");
+  const badCount = $("badCount");
+  const totalLines = $("totalLines");
+  const healthText = $("healthText");
+
+  const reportPreview = $("reportPreview");
+  const mergedPreview = $("mergedPreview");
+
+  const toast = $("toast");
+  const showToast = (t) => {
+    toast.textContent = t;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 1200);
+  };
+
+  const abs = (path) => new URL(path, location.href).toString();
+  baseUrl.textContent = location.origin + location.pathname.replace(/\/[^\/]*$/, "/");
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("کپی شد ✅");
+    } catch {
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      showToast("کپی شد ✅");
+    }
+  }
+
+  $("copyMerged").onclick = () => copyText(abs("./merged.txt"));
+  $("copyAll").onclick = () => {
+    const list =
+      `merged.txt: ${abs("./merged.txt")}\n` +
+      `report.json: ${abs("./report.json")}\n` +
+      `last_updated.txt: ${abs("./last_updated.txt")}\n`;
+    copyText(list);
+  };
+  $("refresh").onclick = () => loadAll(true);
+
+  function setStatus(kind, text) {
+    statusText.textContent = text;
+    dot.className = "dot" + (kind ? " " + kind : "");
+    $("pillStatus").style.borderColor =
+      kind === "ok" ? "rgba(32,201,151,.45)" :
+      kind === "bad" ? "rgba(255,107,107,.45)" :
+      "rgba(255,255,255,.10)";
+  }
+
+  async function safeFetchText(url, maxChars = 6000) {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const t = await r.text();
+    return t.length > maxChars ? (t.slice(0, maxChars) + "\n…(truncated)") : t;
+  }
+
+  async function loadAll(force) {
+    setStatus("", "در حال بررسی…");
+    healthText.textContent = "—";
+    okCount.textContent = "—";
+    badCount.textContent = "—";
+    totalLines.textContent = "—";
+
+    // last_updated.txt
+    try {
+      const t = await safeFetchText("./last_updated.txt", 200);
+      lastUpdated.textContent = t.trim() || "—";
+    } catch {
+      lastUpdated.textContent = "—";
+    }
+
+    // report.json
+    let reportObj = null;
+    try {
+      const r = await fetch("./report.json", { cache: "no-store" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      reportObj = await r.json();
+
+      const ok = Array.isArray(reportObj.ok) ? reportObj.ok.length : 0;
+      const bad = Array.isArray(reportObj.bad) ? reportObj.bad.length : 0;
+      const tl = typeof reportObj.total_lines === "number" ? reportObj.total_lines : "—";
+
+      okCount.textContent = String(ok);
+      badCount.textContent = String(bad);
+      totalLines.textContent = String(tl);
+
+      reportPreview.textContent = JSON.stringify(reportObj, null, 2);
+
+      // Health label
+      if (bad === 0 && ok > 0) {
+        setStatus("ok", "همه چیز OK");
+        healthText.textContent = "OK ✅";
+      } else if (ok === 0) {
+        setStatus("bad", "هیچ منبع سالمی نیست");
+        healthText.textContent = "BAD ❌";
+      } else {
+        setStatus("bad", "بعضی منابع خطا دارند");
+        healthText.textContent = "PARTIAL ⚠️";
+      }
+    } catch (e) {
+      reportPreview.textContent = `خطا در خواندن report.json:\n${e?.message || e}`;
+      setStatus("bad", "گزارش در دسترس نیست");
+      healthText.textContent = "UNKNOWN";
+    }
+
+    // merged.txt preview
+    try {
+      const t = await safeFetchText("./merged.txt", 12000);
+      mergedPreview.textContent = t;
+    } catch (e) {
+      mergedPreview.textContent = `خطا در خواندن merged.txt:\n${e?.message || e}`;
+    }
+  }
+
+  loadAll(false);
+})();
+</script>
+</body>
+  </html>
