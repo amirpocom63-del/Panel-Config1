@@ -1,40 +1,83 @@
+import fs from "fs";
+import { performance } from "perf_hooks";
 
-import fs from "node:fs/promises";
+const raw = process.env.SOURCE_URLS || "";
+const urls = raw.split(",").map(u => u.trim()).filter(Boolean);
 
-const raw = (process.env.SOURCE_URLS || "").trim();
-// مثال SECRET: https://intra.example.com/a.txt,https://intra.example.com/b.txt
-const URLS = raw.split(",").map(s => s.trim()).filter(Boolean);
-
-if (!URLS.length) {
-  console.error("SOURCE_URLS is empty. Set it in GitHub Secrets.");
-  process.exit(1);
+if (urls.length === 0) {
+  console.log("No SOURCE_URLS defined");
+  process.exit(0);
 }
 
-function buildAuthHeaders() {
-  const headers = {};
-  // Basic Auth (اختیاری)
-  const u = process.env.BASIC_USER;
-  const p = process.env.BASIC_PASS;
-  if (u && p) {
-    const token = Buffer.from(`${u}:${p}`).toString("base64");
-    headers["Authorization"] = `Basic ${token}`;
-  }
-  // Bearer token (اختیاری)
-  const apiToken = process.env.API_TOKEN;
-  if (apiToken) headers["Authorization"] = `Bearer ${apiToken}`;
-  headers["Accept"] = "text/plain,*/*";
-  return headers;
-}
+const TIMEOUT = 8000;
+const SLOW_LIMIT = 2000;
+const TEST_FILE = "https://speed.hetzner.de/10MB.bin"; // سبک‌تر از 100MB
+const results = [];
 
-async function fetchText(url, timeoutMs = 8000) {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), timeoutMs);
+async function testServer(url) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), TIMEOUT);
+
+  let latency = 0;
+  let speedMbps = 0;
+  let status = "down";
+
   try {
-    const res = await fetch(url, {
-      signal: ctrl.signal,
-      headers: buildAuthHeaders(),
-    });
-    if (!res.ok) return { ok: false, url, error: `HTTP ${res.status}` };
+    // latency test
+    const start = performance.now();
+    const res = await fetch(url, { signal: controller.signal });
+    latency = Math.round(performance.now() - start);
+
+    if (!res.ok) throw new Error("HTTP " + res.status);
+
+    // download speed test
+    const dlStart = performance.now();
+    const dlRes = await fetch(TEST_FILE);
+    const buffer = await dlRes.arrayBuffer();
+    const dlTime = (performance.now() - dlStart) / 1000;
+    const sizeMB = buffer.byteLength / (1024 * 1024);
+    speedMbps = Math.round((sizeMB / dlTime) * 8);
+
+    if (latency < SLOW_LIMIT) {
+      status = "healthy";
+    } else {
+      status = "slow";
+    }
+
+  } catch (err) {
+    status = "down";
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  results.push({
+    url,
+    status,
+    latency,
+    speedMbps
+  });
+}
+
+async function run() {
+  for (const url of urls) {
+    console.log("Testing:", url);
+    await testServer(url);
+  }
+
+  if (!fs.existsSync("docs")) {
+    fs.mkdirSync("docs");
+  }
+
+  fs.writeFileSync("docs/report.json", JSON.stringify({
+    updated: new Date().toISOString(),
+    total: results.length,
+    results
+  }, null, 2));
+
+  console.log("Report generated.");
+}
+
+run();    if (!res.ok) return { ok: false, url, error: `HTTP ${res.status}` };
     const text = await res.text();
     return { ok: true, url, text };
   } catch (e) {
