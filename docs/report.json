@@ -1,22 +1,24 @@
 {
-  "ok": [
+  "updated": "2026-02-20T18:38:53.415Z",
+  "total": 3,
+  "results": [
     {
-      "url": "https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/refs/heads/main/Reality",
-      "lines": 358
+      "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/mixed_iran.txt،https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vless_iran.txt،https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/trojan_iran.txt",
+      "status": "down",
+      "latency": 375,
+      "speedMbps": 0
     },
     {
-      "url": "https://zaya.link/hamedp71",
-      "lines": 192
+      "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vmess_iran.txt",
+      "status": "healthy",
+      "latency": 141,
+      "speedMbps": 1485
     },
     {
-      "url": "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/trojan.html",
-      "lines": 16
-    },
-    {
-      "url": "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/vmess.html",
-      "lines": 49
+      "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/ss_iran.txt",
+      "status": "healthy",
+      "latency": 130,
+      "speedMbps": 396
     }
-  ],
-  "bad": [],
-  "total_lines": 615
+  ]
 }
