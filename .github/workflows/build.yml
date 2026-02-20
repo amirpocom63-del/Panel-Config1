@@ -1,41 +1,49 @@
 name: Build merged feed
 
-"on":
-  workflow_dispatch:
+on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "*/30 * * * *"   # هر ۳۰ دقیقه (اختیاری)
 
-permissions:
-  contents: write
+concurrency:
+  group: merged-feed
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
+
+      - name: Sync with origin/main (avoid conflicts)
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          git clean -fd
 
       - name: Merge sources
         env:
           SOURCE_URLS: ${{ secrets.SOURCE_URLS }}
-          BASIC_USER: ${{ secrets.BASIC_USER }}
-          BASIC_PASS: ${{ secrets.BASIC_PASS }}
-          API_TOKEN: ${{ secrets.API_TOKEN }}
-        run: node scripts/merge.mjs
+        run: |
+          node scripts/merge.mjs
 
       - name: Commit & push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/merged.txt docs/report.json docs/last_updated.txt
-          git diff --cached --quiet || git commit -m "Update merged feed"
-          # اگر ریموت جلوتر بود، اول rebaseس کن بعد push
-          git pull --rebase origin main
-          git push
+
+          git add docs/report.json
+          git commit -m "Update report" || echo "No changes to commit"
+          git push origin main
