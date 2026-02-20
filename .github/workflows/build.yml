@@ -1,7 +1,9 @@
 name: Build merged feed
 
-on:
+"on":
   workflow_dispatch:
+  push:
+    branches: [ "main" ]
   schedule:
     - cron: "*/30 * * * *"
 
@@ -11,7 +13,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,9 +34,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/merged.txt docs/report.json docs/last_updated.txt
-          git diff --cached --quiet || git commit -m "Update merged feed"
-          git push          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/merged.txt docs/report.json docs/last_updated.txt
           git diff --cached --quiet || git commit -m "Update merged feed"
           git push
