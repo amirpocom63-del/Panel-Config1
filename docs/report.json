@@ -1,8 +1,12 @@
 {
   "ok": [
     {
+      "url": "https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/refs/heads/main/Reality",
+      "lines": 358
+    },
+    {
       "url": "https://zaya.link/hamedp71",
-      "lines": 201
+      "lines": 192
     },
     {
       "url": "https://raw.githubusercontent.com/arshiacomplus/v2rayExtractor/refs/heads/main/trojan.html",
@@ -14,5 +18,5 @@
     }
   ],
   "bad": [],
-  "total_lines": 266
+  "total_lines": 615
 }
