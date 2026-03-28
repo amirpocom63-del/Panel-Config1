@@ -1,24 +1,24 @@
 {
-  "updated": "2026-03-28T18:46:49.030Z",
+  "updated": "2026-03-28T19:32:29.880Z",
   "total": 3,
   "results": [
     {
       "url": "https://raw.githubusercontent.com/liketolivefree/kobabi/main/sub.txt",
       "status": "healthy",
-      "latency": 104,
-      "speedMbps": 816
+      "latency": 116,
+      "speedMbps": 731
     },
     {
       "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/ss_iran.txt",
       "status": "healthy",
-      "latency": 9,
-      "speedMbps": 5459
+      "latency": 65,
+      "speedMbps": 756
     },
     {
       "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vless_iran.txt",
       "status": "healthy",
-      "latency": 16,
-      "speedMbps": 27134
+      "latency": 136,
+      "speedMbps": 3192
     }
   ]
 }
