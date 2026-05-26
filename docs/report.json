@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-26T20:55:53.334Z",
+  "updated": "2026-05-26T22:23:02.425Z",
   "total": 3,
   "results": [
     {
@@ -11,14 +11,14 @@
     {
       "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/ss_iran.txt",
       "status": "healthy",
-      "latency": 10,
-      "speedMbps": 3257
+      "latency": 38,
+      "speedMbps": 856
     },
     {
       "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vless_iran.txt",
       "status": "healthy",
-      "latency": 10,
-      "speedMbps": 33392
+      "latency": 25,
+      "speedMbps": 14477
     }
   ]
 }
