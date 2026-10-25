@@ -1,12 +1,12 @@
 {
-  "updated": "2026-10-24T21:46:04.054Z",
+  "updated": "2026-10-25T00:04:35.493Z",
   "total": 3,
   "results": [
     {
       "url": "https://raw.githubusercontent.com/liketolivefree/kobabi/main/sub.txt",
       "status": "healthy",
-      "latency": 168,
-      "speedMbps": 602
+      "latency": 98,
+      "speedMbps": 1032
     },
     {
       "url": "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/ss_iran.txt",
